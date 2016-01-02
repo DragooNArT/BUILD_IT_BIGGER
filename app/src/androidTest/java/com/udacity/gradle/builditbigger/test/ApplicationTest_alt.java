@@ -1,11 +1,14 @@
 package com.udacity.gradle.builditbigger.test;
 
 import android.app.Instrumentation;
+import android.app.PendingIntent;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;
+import android.test.UiThreadTest;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.JokeGenerator;
 import com.udacity.gradle.builditbigger.MainActivity;
 import com.udacity.gradle.builditbigger.R;
 
@@ -20,14 +23,23 @@ public class ApplicationTest_alt extends ActivityInstrumentationTestCase2<MainAc
         super(MainActivity.class);
     }
 
+    private JokeActivity jokeActivity;
+    private MainActivity activity;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        activity = getActivity();
+    }
+
+    @UiThreadTest
     public void testClickButton() {
-        Button jokeButton = (Button)getActivity().findViewById(R.id.jokeButton);
+        Button jokeButton = (Button)activity.findViewById(R.id.jokeButton);
         Instrumentation.ActivityMonitor receiverActivityMonitor =
                 getInstrumentation().addMonitor(JokeActivity.class.getName(),
                         null, false);
-
         TouchUtils.clickView(this,jokeButton);
-        JokeActivity jokeActivity = (JokeActivity)
+        jokeActivity = (JokeActivity)
                 receiverActivityMonitor.waitForActivityWithTimeout(5000);
         assertNotNull("JokeActivity is null", jokeActivity);
         assertEquals("Monitor for JokeActivity has not been called",
@@ -35,8 +47,19 @@ public class ApplicationTest_alt extends ActivityInstrumentationTestCase2<MainAc
         assertEquals("Activity is of wrong type",
                 JokeActivity.class, jokeActivity.getClass());
         TextView text = (TextView)jokeActivity.findViewById(R.id.jokeTextView);
-        assertNotSame("",text.getText());
+        assertTrue("Result is not joke! result: "+text.getText(),JokeGenerator.isStringJoke(text.getText().toString()));
         assertNotNull(text.getText());
 
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        if(activity!=null) {
+            activity.finish();
+        }
+        if(jokeActivity!=null) {
+            jokeActivity.finish();
+        }
     }
 }

@@ -1,10 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    signingConfigs {
-        config {
-        }
-    }
+
     compileSdkVersion 23
     buildToolsVersion '23.0.2'
     defaultConfig {
@@ -13,8 +10,7 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
-        multiDexEnabled = true
-        testInstrumentationRunner "android.test.InstrumentationTestRunner"
+        multiDexEnabled = false
     }
     buildTypes {
         release {
@@ -22,6 +18,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+
     productFlavors {
         free {
             applicationId "com.udacity.gradle.builditbigger.free"
@@ -30,8 +28,19 @@ android {
             applicationId "com.udacity.gradle.builditbigger.paid"
         }
     }
+    dexOptions {
+        incremental true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
 }
-
+tasks.getByPath(":app:connectedCheck").mustRunAfter tasks.getByPath(":backend:appengineRun")
+tasks.getByPath(":backend:appengineStop").mustRunAfter tasks.getByPath(":app:connectedCheck")
+task testAndroid {
+    dependsOn ":backend:appengineRun", ":app:connectedCheck", ":backend:appengineStop"
+}
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':jokeslib')
@@ -40,5 +49,4 @@ dependencies {
     // Added for AdMob
     freeCompile 'com.google.android.gms:play-services-ads:8.4.0'
     compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.google.android.gms:play-services-ads:8.4.0'
 }

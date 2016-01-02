@@ -26,15 +26,29 @@ public class ApplicationTest extends ActivityInstrumentationTestCase2<MainActivi
     public ApplicationTest() {
         super(MainActivity.class);
     }
-
+    private MainActivity activity;
     @UiThreadTest
     public void testAsyncTask() throws ExecutionException, InterruptedException {
-        EndpointsAsyncTask task = new EndpointsAsyncTask(getActivity());
+        EndpointsAsyncTask task = new EndpointsAsyncTask(activity);
         int jokesCount = JokeGenerator.getInstance().getJokeCount();
         task.execute("tt");
         String result = task.get();
         assertNotNull(result);
-        assertNotSame("", result);
+        assertTrue("Result is not joke! result: "+result,JokeGenerator.isStringJoke(result));
 
     }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        activity = getActivity();
+    }
+
+//    @Override
+//    protected void tearDown() throws Exception {
+//        super.tearDown();
+//        if(activity != null) {
+//            activity.finish();
+//        }
+//    }
 }

@@ -11,6 +11,8 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
 
+import java.util.Date;
+
 import javax.inject.Named;
 
 /** An endpoint class we are exposing */
@@ -31,6 +33,7 @@ public class MyEndpoint {
         MyBean response = new MyBean();
 
         response.setData(JokeGenerator.getInstance().generateJoke());
+        System.out.println("Invoked at "+new Date(System.currentTimeMillis()));
         return response;
     }
 

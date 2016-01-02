@@ -17,7 +17,7 @@ import java.io.IOException;
 
 import lib.joke.dragoonart.jokeandroidactivitylib.JokeActivity;
 
-class EndpointsAsyncTask extends AsyncTask<String, ProgressBar, String> {
+public class EndpointsAsyncTask extends AsyncTask<String, ProgressBar, String> {
     private static MyApi myApiService = null;
     private Context context;
     private MainActivity activity;ProgressBar spinner;

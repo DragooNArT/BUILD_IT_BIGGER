@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 
@@ -20,7 +21,6 @@ public class MainActivityFragment extends Fragment {
 
     public MainActivityFragment() {
     }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -31,16 +31,14 @@ public class MainActivityFragment extends Fragment {
             // get test ads on a physical device. e.g.
             // "Use AdRequest.Builder.addTestDevice("ABCDEF012345") to get test ads on this device."
 
+
+
+        mAdView.setAdUnitId(getString(R.string.banner_ad_unit_id));
         final AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
-////            Handler mainHandler = new Handler(getContext().getMainLooper());
-//            mainHandler.post(new Runnable() {
-//                @Override
-//                public void run() {
         mAdView.loadAd(adRequest);
-//                }
-//            });
+
         return root;
     }
 }

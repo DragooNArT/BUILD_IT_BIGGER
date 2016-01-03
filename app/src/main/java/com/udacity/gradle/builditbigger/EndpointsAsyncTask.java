@@ -8,6 +8,9 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.dragoonart.myapplication.backend.myApi.MyApi;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.services.AbstractGoogleClientRequest;
@@ -26,12 +29,16 @@ public class EndpointsAsyncTask extends AsyncTask<String, ProgressBar, String> {
         this.activity = activity;
 
     }
-
+    private InterstitialAd interstitialAds;
+    private InterstitialAdListener adListener;
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
         spinner =  (ProgressBar)activity.findViewById(R.id.progressBar1);
         spinner.setVisibility(View.VISIBLE);
+        this.interstitialAds = new InterstitialAd(activity.getApplicationContext());
+        adListener = new InterstitialAdListener(interstitialAds);
+        this.interstitialAds.setAdListener(adListener);
     }
 
     @Override
@@ -66,9 +73,40 @@ public class EndpointsAsyncTask extends AsyncTask<String, ProgressBar, String> {
 
     @Override
     protected void onPostExecute(String result) {
-        Intent intent = new Intent(activity, JokeActivity.class);
-        intent.putExtra(JokeActivity.JOKE_EXTRA_ID,result);
+
         spinner.setVisibility(View.GONE);
-        activity.startActivity(intent);
+        final AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+
+        // add your test device here
+        interstitialAds.setAdUnitId(activity.getString(R.string.interstitial_ad_unit_id));
+        adListener.setJoke(result);
+        interstitialAds.loadAd(adRequest);
     }
+
+    private class InterstitialAdListener extends AdListener {
+        private InterstitialAd ad;
+        private String jokeResult;
+        public InterstitialAdListener(InterstitialAd ad) {
+            this.ad=ad;
+        }
+
+        public void setJoke(String joke) {
+            this.jokeResult = joke;
+        }
+
+        @Override
+        public void onAdLoaded() {
+            ad.show();
+        }
+
+        @Override
+        public void onAdClosed() {
+            Intent intent = new Intent(activity, JokeActivity.class);
+            intent.putExtra(JokeActivity.JOKE_EXTRA_ID,jokeResult);
+            activity.startActivity(intent);
+        }
+    }
+
 }
